@@ -163,7 +163,7 @@ export default class Piano
     private createKey(key: number, keyIsBlack: number, offset: number)
     {
         let matId: MRE.Guid = this.whiteKeyMaterial.id;
-        let demensions = WHITE_KEY_DIMENSIONS;
+        let dimensions = WHITE_KEY_DIMENSIONS;
 
         let xOffset = INITIAL_X_POSITION - offset;
         let yOffset = INITIAL_Y_POSITION;
@@ -172,7 +172,7 @@ export default class Piano
         if (keyIsBlack)
         {
             matId = this.blackKeyMaterial.id;
-            demensions = BLACK_KEY_DIMENSIONS;
+            dimensions = BLACK_KEY_DIMENSIONS;
 
             xOffset = INITIAL_X_POSITION - (offset + (WHITE_KEY_DIMENSIONS.x / 2));
             yOffset = INITIAL_Y_POSITION + BLACK_KEY_Y_OFFSET;
@@ -184,7 +184,7 @@ export default class Piano
             definition:
             {
                 shape: MRE.PrimitiveShape.Box,
-                dimensions: demensions
+                dimensions: dimensions
             },
             addCollider: true,
             actor:
