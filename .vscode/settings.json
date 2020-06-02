@@ -1,0 +1,5 @@
+{
+    "appService.showBuildDuringDeployPrompt": false,
+    "appService.defaultWebAppToDeploy": "/subscriptions/8b139ea9-630b-4547-9fcb-3cf9caa3b4d7/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/norybiak-piano",
+    "appService.deploySubpath": ""
+}

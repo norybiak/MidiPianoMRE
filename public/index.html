@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang=en>
+	<head>
+		<meta charset=utf-8>
+		<title>Midi Piano</title>
+
+		<script src="./Client.js"></script>
+		
+		<style>
+			body
+			{
+				background-color: #0099e0;
+			}
+			
+			.midi-info
+			{
+				background-color: white;
+				width: 100%;
+				margin: auto auto;
+				padding: 25px;
+			}
+			
+			#rooms
+			{
+				position: absolute;
+				bottom: 0;
+				margin-left: 25px;
+				margin-bottom: 25px;
+			}
+			
+			#rooms select
+			{
+				font-size: 18px;
+			}
+			
+			#current-room
+			{
+				font-size: 26px;
+				font-weight: bold;
+			}
+		
+		</style>
+	</head>
+	<body>
+		<div class="midi-info">
+			<p id="details"></p>
+			
+			<p>Instructions: Make sure your MIDI capable keyboard is connected to your PC and turned on. This site should automatically detect it. If the MIDI is disconnected, try refreshing. </p>
+			<p>Helpful Tips: It's recommended you mute the piano in Altspace and listen to the sound via the browser or by the keyboard itself. </p>
+		
+		</div>
+		
+
+		<script>
+
+		var MidiPiano = (function() 
+		{
+
+			function initalizeMidiInput()
+			{
+				console.log(navigator.userAgent);
+				//Init the Web MIDI API 	
+				console.log("Initializing MIDI Input");
+				
+				// request MIDI access
+				if (navigator.requestMIDIAccess) {
+					navigator.requestMIDIAccess({
+						sysex: false
+					}).then(onMIDISuccess);
+				} else {
+					console.log("MIDI Input ERROR!");
+				}
+				
+				var data, cmd, channel, type, note, velocity;
+
+				// midi functions
+				function onMIDISuccess(midiAccess) {
+					midi = midiAccess;
+					var inputs = midi.inputs.values();
+					// loop through all inputs
+					for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
+						// listen for midi messages
+						input.value.onmidimessage = onMIDIMessage;
+						// this just lists our inputs in the console
+						
+						var output = "Midi Connected! Device: " + input.value.name;
+						document.getElementById('details').innerHTML = output;
+					}
+					// listen for connect/disconnect message
+					midi.onstatechange = onStateChange;
+				}
+
+				function onMIDIMessage(event) 
+				{
+					data = event.data,
+					cmd = data[0] >> 4,
+					channel = data[0] & 0xf,
+					type = data[0] & 0xf0, // channel agnostic message type. Thanks, Phil Burk.
+					note = data[1],
+					velocity = data[2];
+					// with pressure and tilt off
+					// note off: 128, cmd: 8 
+					// note on: 144, cmd: 9
+					// pressure / tilt on
+					// pressure: 176, cmd 11: 
+					// bend: 224, cmd: 14
+					
+
+					switch (type) {
+						case 144: // noteOn message 
+						
+							  //some midi devices set velocity to 0 instead of broadcasting 128.
+							 if (velocity == 0) { Client.send('noteOff', {note: note-21, velocity: 0});}
+							 else { Client.send('noteOn', {note: note-21, velocity: velocity}); }
+							 break;
+						case 128: // noteOff message 
+							Client.send('noteOff', {note: note-21, velocity: 0});
+							break;
+					}
+				}
+
+				function onStateChange(event) {
+					var port = event.port,
+						state = port.state,
+						name = port.name,
+						type = port.type;
+					if (type == "input") console.log("name", name, "port", port, "state", state);
+					
+					if (state == "disconnected")
+					{
+						var output = "Midi disconnected! Refresh page to reconnect.";
+						document.getElementById('details').innerHTML = output;
+					}
+				}
+				
+				console.log("MIDI Input initalized");
+			}
+			
+			function connect()
+			{
+				Client.connect({host: 'localhost', port: 2020});
+				
+				//These don't have to be in the callback. Can be anywhere, even before the connection is made.
+				//Server.on('noteOn', function(data) { noteOn(data.note, data.velocity, data.color); });
+				//Server.on('noteOff', function(data) { noteOff(data.note, data.velocity); });
+			}
+
+			function start()
+			{
+				initalizeMidiInput();
+				connect();
+			}
+	
+			return { start: start };
+		}());
+		
+		MidiPiano.start();
+	
+		</script>
+	</body>
+</html>
+
+
+
