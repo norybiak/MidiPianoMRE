@@ -114,7 +114,7 @@ export default class Piano
     {
         this.piano = MRE.Actor.CreateFromGltf(this.assets,
         {
-            uri: `${this.baseUrl}/piano.glb`,
+            uri: `${this.baseUrl}/model/piano.glb`,
             actor:
             {
                 name: 'Piano',
@@ -249,7 +249,7 @@ export default class Piano
 
     private handleMidiPlayer()
     {
-        this.MidiPlayer = new MidiPlayer.Player().loadFile('public/midi/hes_a_pirate.mid');
+        this.MidiPlayer = new MidiPlayer.Player().loadFile(`${this.baseUrl}/hes_a_pirate.mid`);
 
         this.MidiPlayer.on('midiEvent', (event: any) =>
         { 
