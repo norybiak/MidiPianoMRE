@@ -247,6 +247,7 @@ export default class Piano
 
     }
 
+    /*
     private handleMidiPlayer()
     {
         this.MidiPlayer = new MidiPlayer.Player().loadFile(`${this.baseUrl}/hes_a_pirate.mid`);
@@ -263,6 +264,7 @@ export default class Piano
             }
         });
     }
+    */
 
     private noteOn(keyIndex: number, velocity: number)
     {
