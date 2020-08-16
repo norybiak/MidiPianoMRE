@@ -20,12 +20,25 @@ var Client = Client || {};
 	{	
 		if (status === 'OPEN') { return; } // We only want to use one instance of WebSocket
 		
-		var host = config.host || false;
-		var port = config.port || 8080;
-		
-		if (!host) { console.log("A valid url must be provided to connect to server!"); return; } //Host must be provided
+		var config = config || {};
+		var host = config.host || 'localhost';
+		var port = config.port;
+		var protocol = 'wss://';
 
-		ws = new WebSocket('ws://' + host + ':' + port);
+		if (!host) { console.log('A valid url must be provided to connect to server!'); return; } //Host must be provided
+
+		if (port)
+		{
+			host = host + ':' + port;
+		}
+
+		if (host.includes('localhost') || host.includes('127.0.0.1'))
+		{
+			protocol = 'ws://';
+			host = host + ':8080';
+		}
+
+		ws = new WebSocket(protocol + host);
 		
 		ws.onopen = function (event)
 		{

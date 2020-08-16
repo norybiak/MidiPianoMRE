@@ -1,6 +1,6 @@
 import * as MRE from '@microsoft/mixed-reality-extension-sdk';
 import MidiPlayer from 'midi-player-ts';
-import MidiServer from './midiServer';
+import * as MidiServer from './midi-server';
 
 // Trial and error
 const PIANO_SCALE = 0.22;
@@ -55,7 +55,7 @@ const OCTAVE_LAYOUT = [
 const whiteKeyRotationDegrees = 3;
 const blackKeyRotationDegrees = 1;
 
-interface keyState 
+interface KeyState 
 {
     originalPosition: MRE.Vector3, 
     originalRotation: MRE.Quaternion, 
@@ -78,12 +78,12 @@ export default class Piano
     //private note: { [key: string]: MRE.Sound };
     private keySounds: MRE.Sound[] = [];
     private keyActors: MRE.Actor[] = [];
-    private keyState: keyState[] = [];
+    private keyState: KeyState[] = [];
 
     private whiteKeyMaterial: MRE.Material;
     private blackKeyMaterial: MRE.Material;
 
-    constructor(private context: MRE.Context, private MidiServer: MidiServer, private baseUrl: string)
+    constructor(private context: MRE.Context, private MidiServer: MidiServer.Websocket, private baseUrl: string)
     {
         this.assets = new MRE.AssetContainer(context);
 
@@ -218,7 +218,7 @@ export default class Piano
 
         const keyBehavior = actor.setBehavior(MRE.ButtonBehavior);
 
-        keyBehavior.onClick(() =>
+        keyBehavior.onButton('pressed', () =>
         {
             this.noteOn(key, 127);
 
@@ -230,7 +230,7 @@ export default class Piano
 
     private handleMidiServer()
     {
-        this.MidiServer.on('noteOn', (data) =>
+        this.MidiServer.on('noteOn', (data: MidiServer.Data) =>
         {
             let note = data.note;
             let velocity = data.velocity as number / 127;
@@ -238,7 +238,7 @@ export default class Piano
             this.noteOn(note, velocity);
         });
 
-        this.MidiServer.on('noteOff', (data) =>
+        this.MidiServer.on('noteOff', (data: MidiServer.Data) =>
         {
             let note = data.note;
 
@@ -247,7 +247,6 @@ export default class Piano
 
     }
 
-    /*
     private handleMidiPlayer()
     {
         this.MidiPlayer = new MidiPlayer.Player().loadFile(`${this.baseUrl}/hes_a_pirate.mid`);
@@ -264,14 +263,14 @@ export default class Piano
             }
         });
     }
-    */
-
+    
     private noteOn(keyIndex: number, velocity: number)
     {
         const instance = this.piano.startSound(this.keySounds[keyIndex].id,
         {
             doppler: 0.0, 
-            volume: velocity
+            volume: velocity, 
+            spread: 0.5
         });
         
         if (!this.keyState[keyIndex].rotated)

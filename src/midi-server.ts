@@ -1,16 +1,21 @@
 import * as WS from 'ws';
 import { EventEmitter } from 'events';
 
-
-type Packet =
+export interface Data
 {
-    event: string;
-    data: string;
+    note: number;
+    velocity: number;
 }
 
-export default class MidiServer extends EventEmitter
+interface Packet
 {
-    constructor(port: number) 
+    event: string;
+    data: Data;
+}
+
+export class Websocket extends EventEmitter
+{
+    constructor(port: number = 8080) 
     {
         super();
 
@@ -22,9 +27,9 @@ export default class MidiServer extends EventEmitter
     {
         wss.on('connection', ws =>
         {
-            ws.on('message', (packet: WS.Data) =>
+            ws.on('message', (packet: string) =>
             {
-                this.parseReceived(JSON.parse(packet as string));
+                this.parseReceived(JSON.parse(packet));
             });
 
             ws.on('close', () =>
@@ -36,9 +41,6 @@ export default class MidiServer extends EventEmitter
 
     private parseReceived(packet: Packet)
     {
-        let event = packet.event;
-        let data = packet.data;
-    
-        this.emit(event, data);  
+        this.emit(packet.event, packet.data);  
     }
 }
