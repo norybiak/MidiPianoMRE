@@ -1,15 +1,21 @@
-Shows a text that animates when highlighting or clicking on a cube.
+# MIDI Piano MRE
+A multiplayer VR piano designed for AltspaceVR using the MRE SDK.
 
-## Editing
+Using an external browser on your PC, you can connect your MIDI capable piano keyboard and pipe in the data to play in realtime!
 
-* Open this folder in VSCode.
+## How to deploy
 
-## Building
+* Requries Node.js 
 
-* From inside VSCode: `Shift+Ctrl+B`
-* From command line: `npm run build`
+1) Clone this repository (or download zip)
+2) Run `npm install`
+3) Run `npm run build`
+4) Run `npm run start`
+5) In Altspace, create a new MRE instance in your world
+6) Add `ws://localhost:3901` as the target URI
 
-## Running
-
-* From inside VSCode: `F5`
-* From command line: `npm start`
+## Using a MIDI capable piano
+1) Make sure your MIDI keyboard is turned on and connected to your PC
+2) Open `/public/index.html`
+3) Allow your browser to access the device
+4) Play away!
